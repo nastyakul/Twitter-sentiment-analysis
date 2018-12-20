@@ -17,10 +17,10 @@ def main(args):
         with jsonlines.open(args.output, "w") as writer:
             for tweet in reader:
                 # Preprocess the tweet text
-                text = preprocess_tweet(tweet["full_text"])
+                text = preprocess_tweet(tweet)
                 # Turn it into an input vector
-                vector = tokenizer.texts_to_matrix([text], \
-                mode='binary')
+                vector = tokenizer.transform([text])
+                vector = vector.toarray()
                 # Feed it into the model
                 sentiment = model.predict(vector) 
                 # Register the sentiment

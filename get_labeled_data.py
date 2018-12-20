@@ -4,6 +4,8 @@ import sys
 import jsonlines
 import json
 
+simple_keys = ['created_at', 'full_text']
+
 def main(args):
     config_dict = json.load(args.config)
     # Dictionnary storing the text so that 
@@ -12,7 +14,24 @@ def main(args):
     with jsonlines.open(args.input) as reader:
         with jsonlines.open(args.output, "w") as writer:
             # Only fetch the wanted hashtags ( specified in the config file ) and label the tweet for (1) or against (0)
-            for tweet in reader:
+            i = 0
+            while i < args.limit:
+            #for tweet in reader:
+                tweet = reader.read()
+                if tweet['lang']=='en':
+                    my_dict={}
+                    for key in simple_keys:
+                        my_dict[key]=tweet[key]
+                    my_dict['user_id'] = tweet['user']['id']
+                    my_dict['hashtags'] = tweet['entities']['hashtags']
+                    for hashtag in my_dict['hashtags']:
+                        hashtag['text'] = hashtag['text'].lower()
+                    my_dict['symbols'] = tweet['entities']['symbols']
+                else:
+                    continue
+                # Here it means tweet has been selected
+                # and you can select hashtags
+                tweet = my_dict
                 for_flag = False
                 against_flag = False
                 for hashtag in tweet["hashtags"]:
@@ -43,12 +62,16 @@ def main(args):
                         if tweet["full_text"] not in reminder:
                             writer.write(tweet)
                             reminder[tweet["full_text"]] = 1
+                            # Increase the count of tweets 
+                            # in the training set
+                            i += 1
     return
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--input","-i")
     parser.add_argument("--output","-o")
+    parser.add_argument("--limit","-l",type=int)
     parser.add_argument("--config", type=argparse.FileType("r"))
     args = parser.parse_args()
     main(args)

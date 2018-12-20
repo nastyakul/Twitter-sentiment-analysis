@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 from sklearn.ensemble import RandomForestClassifier  
 from sklearn.model_selection import train_test_split
-from preprocessing import preprocess_tweet, get_doc_list
+from preprocessing import get_doc_list
 
 
 
@@ -17,12 +17,6 @@ def main(args):
 
     # Create the model
     model = RandomForestClassifier(10, min_samples_split=10)
-
-    # Mix the data
-    randomize = np.arange(len(labels))
-    np.random.shuffle(randomize)
-    encoded_docs = encoded_docs[randomize,:]
-    labels = labels[randomize]
 
     # Split into test/training data
     X_train, X_test, y_train, y_test = \

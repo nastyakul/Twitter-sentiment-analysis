@@ -9,15 +9,13 @@ from preprocessing import preprocess_tweet
 
 def predict(text):
     """ Feeds the text into the model and output it's prediction """
-    # Preprocess the tweet text
-    text = preprocess_tweet(text)
-    # Turn it into an input vector
-    vector = tokenizer.texts_to_matrix([text], \
-    mode='binary')
+    # Turn the text into an input vector
+    vector = tokenizer.transform([text])
+    vector = vector.toarray()
     # Feed it into the model
     sentiment = model.predict(vector) 
     # Register the sentiment
-    print("Stay:{0:10.4f}, Leave:{1:10.4f}".format(sentiment[0][0], sentiment[0][1]))
+    print("Stay:{0:10.4f}, Leave:{1:10.4f}".format(1 - sentiment[0][0], sentiment[0][0]))
 
 
 if __name__ == '__main__':
